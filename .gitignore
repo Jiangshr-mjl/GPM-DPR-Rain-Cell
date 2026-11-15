@@ -1,0 +1,38 @@
+# Python 与构建产物
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.coverage
+htmlcov/
+build/
+dist/
+
+# 环境与编辑器
+.venv/
+.venv-*/
+venv/
+.idea/
+.vscode/
+.env
+.env.*
+!.env.example
+
+# 原始观测数据、计算结果与本地归档（不影响已跟踪的 Figure/、Document/）
+data/
+output/
+outputs/
+results/
+*.h5
+*.H5
+*.hdf5
+*.HDF5
+*.nc
+*.npy
+*.npz
+*.zip
+*.log
+
+# 操作系统
+.DS_Store
+Thumbs.db
