@@ -1,5 +1,6 @@
 """独立合成数据测试；不读取真实观测数据，也不访问网络。"""
 
+import os
 from pathlib import Path
 import subprocess
 import sys
@@ -207,6 +208,41 @@ class BatchTests(unittest.TestCase):
         )
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertTrue(self.destination.is_file())
+
+    def test_help_with_cp1252_standard_streams(self):
+        project = Path(__file__).resolve().parents[1]
+        env = dict(os.environ, PYTHONIOENCODING="cp1252", PYTHONUTF8="0")
+        commands = [
+            [sys.executable, "-m", "gpm_raincell"],
+            [sys.executable, str(project / "DPR_baidrc.py")],
+            [sys.executable, str(project / "DPRtoRCmultiyears.py")],
+        ]
+        for command in commands:
+            with self.subTest(command=command):
+                result = subprocess.run(
+                    [*command, "--help"], cwd=project, env=env, capture_output=True,
+                )
+                self.assertEqual(result.returncode, 0, result.stderr)
+                self.assertIn("近地面降雨率阈值", result.stdout.decode("utf-8"))
+
+    def test_logs_and_errors_with_cp1252_standard_streams(self):
+        project = Path(__file__).resolve().parents[1]
+        env = dict(os.environ, PYTHONIOENCODING="cp1252", PYTHONUTF8="0")
+        command = [sys.executable, "-m", "gpm_raincell"]
+        result = subprocess.run(
+            [*command, "--input", str(self.source), "--output", str(self.destination.parent)],
+            cwd=project, env=env, capture_output=True,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("完成", result.stderr.decode("utf-8"))
+        self.assertTrue(self.destination.is_file())
+        result = subprocess.run(
+            [*command, "--input", str(self.root / "missing.HDF5"),
+             "--output", str(self.destination.parent)],
+            cwd=project, env=env, capture_output=True,
+        )
+        self.assertEqual(result.returncode, 2, result.stderr)
+        self.assertIn("输入路径不存在", result.stderr.decode("utf-8"))
 
     def test_invalid_cli_arguments(self):
         with patch("sys.stderr"):

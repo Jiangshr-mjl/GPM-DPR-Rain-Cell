@@ -53,6 +53,8 @@ gpm-raincell --input "D:/GPM" --output "D:/rc_data"
 
 示例路径请替换为本地位置，Linux/macOS 可使用 `/path/to/GPM`。命令不会下载观测数据。
 
+命令行的帮助、日志和错误信息统一以 **UTF-8** 输出，避免 Windows 重定向输出时使用 `cp1252` 导致中文编码错误；保存或读取日志文件时请采用 UTF-8。
+
 ## 3. 雨团判据与识别流程
 
 | 参数 | 默认值 | 含义 |

@@ -4,6 +4,7 @@ import argparse
 import logging
 import os
 from pathlib import Path
+import sys
 import tempfile
 
 import h5py
@@ -151,6 +152,13 @@ def make_parser():
 
 
 def main(argv=None):
+    # Windows 重定向到管道时可能默认 cp1252，无法输出中文帮助和日志。
+    # 所有命令行入口统一输出 UTF-8；不依赖 CI/终端预设的编码环境变量。
+    # 嵌入调用时兼容没有 reconfigure 方法的 StringIO 等捕获流。
+    for stream in (sys.stdout, sys.stderr):
+        reconfigure = getattr(stream, "reconfigure", None)
+        if reconfigure is not None:
+            reconfigure(encoding="utf-8", errors="backslashreplace")
     parser = make_parser()
     args = parser.parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
